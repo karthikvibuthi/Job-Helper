@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Helper</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container mt-4">
+      <!-- Title Row -->
+      <div class="row card">
+        <div class="col text-center">
+          <h2 class="text-primary">Job Helper</h2>
+        </div>
+      </div>
+
+      <!-- File Upload and Resume Details Row -->
+      <div class="row mt-4 justify-content-between">
+        <!-- File Upload and Basic Information Column (1st column) -->
+        <div class="col-md-4">
+          <div class="mb-3">
+            <label for="fileUpload" class="form-label"
+              >Upload Your Resume (PDF)</label
+            >
+            <input
+              id="fileUpload"
+              type="file"
+              onchange="onFileSelected(event)"
+              class="form-control"
+              accept=".pdf"
+            />
+          </div>
+
+          <!-- Resume Basic Information -->
+          <!-- <div id="basic-info" style="display: none"> -->
+            <div id="basic-info" >
+            <p><strong>Resume Details</strong></p>
+            <p><strong>Name:</strong> <span id="name"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+            <div id="degrees"></div>
+            <div id="majors"></div>
+          <div id="education-info">
+            <h4>Education</h4>
+            <p id="education"></p>
+          </div>
+            
+          </div>
+
+          <div id="experience-info">
+            <h4>Experience</h4>
+            <p>
+              <strong>Total Experience:</strong>
+              <span id="total-experience"></span>
+            </p>
+            <p><strong>Designations:</strong> <span id="designations"></span></p>
+            <p>
+              <strong>Companies:</strong>
+              <span id="companies"></span>
+            </p>
+            <h4>Achievements</h4>
+            <ul id="achievements-list"></ul>
+            
+          </div>
+
+          
+        </div>
+
+        <!-- Skills Column (2nd column) -->
+         <!-- <div class="col-md-4" id="key-factors" style="display: none"> -->
+        <div class="col-md-4" id="key-factors" >
+          <h4>Key Factors</h4>
+         
+            <h4>Impact Words</h4>
+            <p>
+              <strong>Action Words:</strong> <span id="action-words"></span>
+            </p>
+            <p><strong>Metrics:</strong> <span id="metrics"></span></p>
+            <p><strong>Weak Words:</strong> <span id="weak-words"></span></p>
+            <h4>Buzz Words</h4>
+            <p><strong>Positive:</strong> <span id="positive-buzz"></span></p>
+            <p><strong>Negative:</strong> <span id="negative-buzz"></span></p>
+          <h4>Skills</h4>
+          <div class="row">
+            <ul class="col-6" id="skills-list-left"></ul>
+            <ul class="col-6" id="skills-list-right"></ul>
+          </div>
+        </div>
+
+
+
+        <!-- Remaining Details Column (4th column) -->
+        <!-- <div class="col-md-3" id="other-info" style="display: none"> -->
+          <div class="col-md-3" id="other-info" >
+          <h4>Other Details</h4>
+          <p>
+            <strong>Spelling Mistakes:</strong>
+            <span id="spelling-mistakes"></span>
+          </p>
+          <p>
+            <strong>Bullet Points:</strong> <span id="bullet-points"></span>
+          </p>
+          <p>
+            <strong>Resume Length:</strong> <span id="resume-length"></span>
+          </p>
+          <h4>Repeated Words</h4>
+          <ul id="repeated-words-list"></ul>
+          <p><strong>Score:</strong> <span id="score"></span></p>
+        </div>
+      </div>
+
+      <!-- Jobs Section -->
+      <div id="jobs-section" >
+      <!-- <div id="jobs-section" style="display: none"> -->
+        <h3 class="text-secondary">Jobs that you match</h3>
+        <!-- Placeholder for matched jobs content -->
+      </div>
+    </div>
+
+    <!-- JavaScript to handle file upload and display -->
+    <script>
+      async function onFileSelected(event) {
+        const formData = new FormData();
+        const file = event.target.files[0];
+        if (!file) {
+          alert("Please select a file to upload.");
+          return;
+        }
+        formData.append("resume", file);
+
+        try {
+          const response = await fetch(
+            "http://127.0.0.1:5000/api/parse-resume",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            alert(errorData.error || "Failed to upload file");
+            return;
+          }
+
+          const resumeData = await response.json();
+          console.log(resumeData)
+          displayResumeData(resumeData);
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Error uploading file");
+        }
+      }
+
+      function displayResumeData(data) {
+        document.getElementById("basic-info").style.display = "block";
+        document.getElementById("key-factors").style.display = "block";
+        document.getElementById("other-info").style.display = "block";
+        document.getElementById("jobs-section").style.display = "block";
+
+        document.getElementById("name").textContent = data.name || "N/A";
+        document.getElementById("email").textContent = data.email || "N/A";
+
+        const degrees = data.degrees || [];
+        document.getElementById("degrees").innerHTML = degrees
+          .map((degree) => `<p><strong>Degree:</strong> ${degree}</p>`)
+          .join(" ");
+
+        const majors = data.majors || [];
+        document.getElementById("majors").innerHTML = majors
+          .map((major) => `<p><strong>Major:</strong> ${major}</p>`)
+          .join("");
+
+        document.getElementById("designations").textContent =
+          data.designations?.join(", ") || "N/A";
+
+        document.getElementById("total-experience").textContent =
+          data.totalExperience || 0;
+
+        const companies = data.companies || [];
+
+        document.getElementById("companies").textContent =
+        data.companies?.join(", ") || "N/A";
+  
+
+        const achievements = data.achievements || [];
+        document.getElementById("achievements-list").innerHTML = 
+          achievements || 0;
+
+        document.getElementById("action-words").textContent =
+          data.impactWords?.action_words.join(", ") || "N/A";
+        document.getElementById("spelling-mistakes").innerHTML = data.spellingMistakes || 0 ;
+        document.getElementById("metrics").textContent =
+          data.impactWords?.metrics.join(", ") || "N/A";
+        document.getElementById("weak-words").textContent =
+          data.impactWords?.weak_words.join(", ") || "N/A";
+
+        document.getElementById("positive-buzz").textContent =
+          data.positiveBuzzwords?.join(", ") || "N/A";
+        document.getElementById("negative-buzz").textContent =
+          data.negativeBuzzwords?.join(", ") || "N/A";
+
+        document.getElementById("education").textContent =
+          data.education || "N/A";
+
+        const skills = data.skills || [];
+        const midIndex = Math.ceil(skills.length / 2);
+        const skillsLeft = skills.slice(0, midIndex);
+        const skillsRight = skills.slice(midIndex);
+
+        document.getElementById("skills-list-left").innerHTML = skillsLeft
+          .map((skill) => `<li>${skill}</li>`)
+          .join("");
+        document.getElementById("skills-list-right").innerHTML = skillsRight
+          .map((skill) => `<li>${skill}</li>`)
+          .join("");
+
+        document.getElementById("bullet-points").textContent =
+          data.bulletPoints || 0;
+        document.getElementById("resume-length").textContent = data.length || 0;
+
+        document.getElementById("repeated-words-list").innerHTML =
+          Object.entries(data.repeatedWords || {})
+            .map(([word, count]) => `<li>${word}: ${count}</li>`)
+            .join("");
+
+        document.getElementById("score").textContent = data.score || 0;
+      }
+    </script>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
