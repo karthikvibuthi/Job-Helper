@@ -286,6 +286,15 @@ def repetition_word_score(repeated_words):
         return SCORE_WEIGHTS["repetition"]
     return 0
 
+# Experience score calculation
+def experience_score(sections):
+    experience_text = sections.get("Experience", "")
+    experience_lines = experience_text.strip().splitlines()
+    if len(experience_lines) > 5:  # More than 5 lines of experience is considered a complete experience section
+        return SCORE_WEIGHTS["experience"]
+    return (len(experience_lines) / 5) * SCORE_WEIGHTS["experience"]
+
+
 # Main function to calculate resume score
 def calculate_resume_score(resume_text):
     """
@@ -324,8 +333,11 @@ def calculate_resume_score(resume_text):
     repeated_words = check_repeated_words(resume_text)
     repetition_eval_score = repetition_word_score(repeated_words)
 
+    # Experience scoring
+    experience_eval_score = experience_score(sections)
+    
     # Calculate total score
-    total_score = section_score + skills_eval_score + spelling_eval_score + impactful_words_eval_score + structure_eval_score + repetition_eval_score
+    total_score = section_score + skills_eval_score + spelling_eval_score + impactful_words_eval_score + structure_eval_score + repetition_eval_score + experience_eval_score
 
     # Create the result object
     result = {
@@ -337,6 +349,7 @@ def calculate_resume_score(resume_text):
             "impactful_words": round(impactful_words_eval_score, 2),
             "structure_evaluation": round(structure_eval_score, 2),
             "repetition_evaluation": round(repetition_eval_score,2),
+            "experience_evaluation": round(experience_eval_score,2),
         },
     }
 
