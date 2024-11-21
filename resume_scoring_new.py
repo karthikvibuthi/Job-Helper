@@ -18,13 +18,16 @@ stop_words = nlp.Defaults.stop_words
 SCORE_WEIGHTS = {
     "sections": 20,  # Sections completeness
     "spelling": 10,  # Spell-check
-    "keywords": 30,  # Impactful words
+    "keywords": 15,  # Impactful words
     "skills": 20,    # Skills section
-    "structure": 25  # Overall structure
+    "structure": 25, # Overall structure
+    "experience": 15, # Experience section
+    "projects": 12,   # Projects section
+    "repetition": -5  # Deduct for repeated words
 }
 
 # Section Definitions
-required_sections = ["Summary", "Experience", "Education", "Skills"]
+required_sections = ["Summary", "Experience", "Education", "Skills", "Projects"]
 
 # Extract sections
 def extract_sections(text):
@@ -270,6 +273,19 @@ def structure_score(text):
         return SCORE_WEIGHTS["structure"]
     return (bullet_points / 10) * SCORE_WEIGHTS["structure"]
 
+# Check for repetitive words and penalize
+def check_repeated_words(text):
+    words = [word.lower() for word in text.split() if word.isalpha()]
+    word_count = Counter(words)
+    repeated_words = {word: count for word, count in word_count.items() if count > 3}  # Threshold is 3 repetitions
+    return repeated_words
+
+# Repetition word score
+def repetition_word_score(repeated_words):
+    if repeated_words:
+        return SCORE_WEIGHTS["repetition"]
+    return 0
+
 # Main function to calculate resume score
 def calculate_resume_score(resume_text):
     """
@@ -304,8 +320,12 @@ def calculate_resume_score(resume_text):
     # Structure scoring
     structure_eval_score = structure_score(resume_text)
 
+    # Check for repeated words
+    repeated_words = check_repeated_words(resume_text)
+    repetition_eval_score = repetition_word_score(repeated_words)
+
     # Calculate total score
-    total_score = section_score + skills_eval_score + spelling_eval_score + impactful_words_eval_score + structure_eval_score
+    total_score = section_score + skills_eval_score + spelling_eval_score + impactful_words_eval_score + structure_eval_score + repetition_eval_score
 
     # Create the result object
     result = {
@@ -316,6 +336,7 @@ def calculate_resume_score(resume_text):
             "spelling_evaluation": round(spelling_eval_score, 2),
             "impactful_words": round(impactful_words_eval_score, 2),
             "structure_evaluation": round(structure_eval_score, 2),
+            "repetition_evaluation": round(repetition_eval_score,2),
         },
     }
 
