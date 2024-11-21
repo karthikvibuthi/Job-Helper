@@ -1,5 +1,6 @@
 import jobs_recommendation as jr
 import events_recommendations as er
+import resume_scoring_new as scoring
 import spacy
 from spacy.matcher import Matcher
 import nltk
@@ -113,6 +114,7 @@ def parse_resume(resume_text):
     if "Achievements" in sections:
         achievements = sections["Achievements"]
     details['achievements'] = resume_parser.count_bullet_points(achievements) if achievements else []
+    details['scores_new'] = scoring.calculate_resume_score(resume_text)
 
 
 
