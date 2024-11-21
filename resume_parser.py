@@ -14,54 +14,55 @@ stop_words = nlp.Defaults.stop_words
     
 # Define section aliases and their identifiers
 section_definitions = {
-        "Summary": {
-            "aliases": [
-                "Personal Summary", "Summary", "Professional Summary", 
-                "Experience Summary", "Professional Statement", 
-                "Summary Statement", "Career Overview", 
-                "Experience Overview", "Profile", 
-                "Profile Overview", "Profile Summary", 
-                "Professional Profile", "Work Summary", 
-                "Work Overview"
-            ],
-            "identifier": ["address", "zip code", "mail id"]
-        },
-        "Statement": {
-            "aliases": [
-                "Statement", "Objective", "Objective Statement", 
-                "Resume Objective", "Personal Objective", 
-                "Profile Objective", "Personal Statement"
-            ],
-            "identifier": ["address", "zip code", "mail id"]
-        },
-        "Experience": {
-            "aliases": [
-                "PROFESSIONAL EXPERIENCE", "Work", 
-                "Work Experience", "Experience", "Training"
-            ]
-        },
-        "Education": {
-            "aliases": [
-                "Education", "Coursework", 
-                "Schooling"
-            ]
-        },
-        "Skills": {
-            "aliases": [
-                "Skills", "Skillset"
-            ]
-        },
-        "Projects": {
-            "aliases": [
-                "Project", "Projects"
-            ]
-        },
-        "Achievements": {
-            "aliases": [
-                "Achievements", "Accomplishments", "Awards"
-            ]
-        }
+    "summary": {
+        "aliases": [
+            "personal summary", "summary", "professional summary",
+            "experience summary", "professional statement",
+            "summary statement", "career overview",
+            "experience overview", "profile",
+            "profile overview", "profile summary",
+            "professional profile", "work summary",
+            "work overview"
+        ],
+        "identifier": ["address", "zip code", "mail id"]
+    },
+    "statement": {
+        "aliases": [
+            "statement", "objective", "objective statement",
+            "resume objective", "personal objective",
+            "profile objective", "personal statement"
+        ],
+        "identifier": ["address", "zip code", "mail id"]
+    },
+    "experience": {
+        "aliases": [
+            "professional experience", "work",
+            "work experience", "experience", "training"
+        ]
+    },
+    "education": {
+        "aliases": [
+            "education", "coursework",
+            "schooling"
+        ]
+    },
+    "skills": {
+        "aliases": [
+            "skills", "skillset"
+        ]
+    },
+    "projects": {
+        "aliases": [
+            "project", "projects"
+        ]
+    },
+    "achievements": {
+        "aliases": [
+            "achievements", "accomplishments", "awards"
+        ]
     }
+}
+
 
 
 def extract_entity_sections(nlp_text):
@@ -73,13 +74,13 @@ def extract_entity_sections(nlp_text):
     # Function to check for aliases in tokens
     def check_for_aliases(token):
         for section, details in section_definitions.items():
-            if token.text in details["aliases"]:
+            if token.text.lower() in details["aliases"]:
                 return section
         return None
 
     # Loop through tokens to identify section headers
     for i, token in enumerate(nlp_text):
-        if token.text in [alias for aliases in section_definitions.values() for alias in aliases['aliases']]:
+        if token.text.lower() in [alias for aliases in section_definitions.values() for alias in aliases['aliases']]:
             detected_section = check_for_aliases(token)
 
             if detected_section:
@@ -153,12 +154,12 @@ def extract_surrounding_text(text):
 
 def get_experience_section(resume_text):
     sections = extract_entity_sections(resume_text)
-    return extract_surrounding_text(sections.get("Experience", "No Experience section found."))
+    return extract_surrounding_text(sections.get("experience", "No Experience section found."))
 
 
 def get_education_section(resume_text):
     sections = extract_entity_sections(resume_text)
-    return sections.get("Education", "No Education section found.")
+    return sections.get("education", "No Education section found.")
 
 
 def extract_email(text):
@@ -175,8 +176,10 @@ def extract_name(nlp_text, matcher):
         span = nlp_text[start:end]
         return span.text
 
-def extract_skills(nlp_text, noun_chunks):
+def extract_skills(nlp_text):
     """Extracts skills based on a predefined skill list."""
+    nlp_text = nlp(nlp_text)
+    noun_chunks = list(nlp_text.noun_chunks)
     tokens = [token.text for token in nlp_text if not token.is_stop]
     data = pd.read_csv(os.path.join(os.path.dirname(__file__), 'skills.csv'))
     skills = list(data.columns.values)
@@ -472,7 +475,7 @@ class ResumeScorer:
         self.resume = resume
 
     def calculate_score(self):
-        score = 1
+        score = 100
         
         # Bullet Points
         if 12 <= self.resume['bulletPoints'] <= 20:
@@ -496,6 +499,9 @@ class ResumeScorer:
         # Positive Buzzwords
         score += len(self.resume['positiveBuzzwords']) * 1  # 1 point per positive buzzword
 
+        #skills
+        skills_score = min(len(set(self.resume['skills'])) // 5, 5)
+        score += skills_score
         # Negative Buzzwords
         score -= len(self.resume['negativeBuzzwords']) * 2  # Deduct 2 points per negative buzzword
 
@@ -511,7 +517,7 @@ class ResumeScorer:
         score += len(self.resume['projects']) * 3  # 3 points per project
 
         # Inclusion of Key Sections
-        required_sections = ['Projects', 'Experience', 'Education', 'Summary', 'Objective', 'Achievements']
+        required_sections = ['projects', 'experience', 'education', 'summary', 'objective', 'achievements']
         for section in required_sections:
             if section in self.resume["sections"]:
                 score += 1  # Add 1 point if section is included
@@ -523,3 +529,77 @@ class ResumeScorer:
 
 
 
+import re
+
+def calculate_score(details):
+    
+    # Rule 1: Bullet Points (12-20 is good)
+    bullet_points_score = 10 if 12 <= details['bulletPoints'] <= 20 else 0
+    bullet_points_weight = 3
+    bullet_points_final = bullet_points_score * bullet_points_weight
+    
+    # Rule 2: Length (500-1000 is good)
+    length_score = 10 if 500 <= details['length'] <= 1000 else 0
+    length_weight = 3
+    length_final = length_score * length_weight
+    
+    # Rule 3: Repetition Words (-1 point for every 5 repetitions)
+    repetition_score = -1 * (sum(details['repeatedWords'].values()) // 5)
+    
+    # Rule 4: Spelling Mistakes (-4, Weightage: 4)
+    spelling_score = -4 * details['spellingMistakes']
+    spelling_weight = 4
+    spelling_final = spelling_score * spelling_weight
+    
+    # Rule 5: Experience (+2 or 0 based on if there is experience)
+    experience_score = 2 if details['totalExperience'] > 0 else 0
+    experience_weight = 2
+    experience_final = experience_score * experience_weight
+    
+    # Rule 6: Positive Buzzwords (+1, Weightage: 3)
+    positive_buzzwords_score = len(details['positiveBuzzwords'])
+    positive_buzzwords_weight = 3
+    positive_buzzwords_final = positive_buzzwords_score * positive_buzzwords_weight
+    
+    # Rule 7: Negative Buzzwords (-2, Weightage: 4)
+    negative_buzzwords_score = -2 * len(details['negativeBuzzwords'])
+    negative_buzzwords_weight = 4
+    negative_buzzwords_final = negative_buzzwords_score * negative_buzzwords_weight
+    
+    # Rule 8: Impact Words (Actions words, Metric) per bullet point, Weightage: 4
+    impact_words_score = len(details['impactWords']['action_words']) + len(details['impactWords']['metrics'])
+    impact_words_weight = 4
+    impact_words_final = impact_words_score * impact_words_weight
+    
+    # Rule 9: Certifications (+3 per certification, Weightage: 4)
+    certifications_score = 3 * len(details.get('certifications', []))
+    certifications_weight = 4
+    certifications_final = certifications_score * certifications_weight
+    
+    # Rule 10: Projects (+3 per project, Weightage: 4)
+    projects_score = 3 * len(details['projects'])
+    projects_weight = 4
+    projects_final = projects_score * projects_weight
+    
+    # Rule 11: Inclusion of Sections (Projects/Experience, Education, Summary, Objective, Accomplishments)
+    # Check for presence of key sections and give +1 if present, else -1
+    sections = [
+        details['summary'], 
+        details['objective'], 
+        details['achievements'], 
+        details['degrees'], 
+        details['projects']
+    ]
+    sections_score = sum(1 if section else -1 for section in sections)
+    skills_score = min(len(set(details['skills'])) // 5, 5)
+    
+    # Calculate total score
+    total_score = (bullet_points_final + length_final + experience_final + 
+                   positive_buzzwords_final + negative_buzzwords_final +
+                   impact_words_final + certifications_final + projects_final + 
+                   sections_score + repetition_score + spelling_final + skills_score + 100)
+    
+    # Ensure score is between 1 and 100
+    final_score = max(1, min(total_score, 100))
+    
+    return final_score

@@ -113,12 +113,27 @@
         </div>
       </div>
 
-      <!-- Jobs Section -->
-      <div id="jobs-section" >
-      <!-- <div id="jobs-section" style="display: none"> -->
-        <h3 class="text-secondary">Jobs that you match</h3>
-        <!-- Placeholder for matched jobs content -->
+      <div class="row">
+        <!-- Jobs Section -->
+      <div id="jobs-section" class="col-6" style="display: none">
+        <div class="d-flex d-inline-flex align-items-center gap-2">
+          <h3 class="text-secondary">Recommended Jobs</h3><p class="fs-3"id="totalJobs"></p>
+        </div>
+        <div id="job-list" class="list-group"></div>
       </div>
+
+      <!--events Section -->
+      <div id="events-section" class="col-6" style="display: none">
+        <div class="d-flex d-inline-flex align-items-center gap-2">
+          <h3 class="text-secondary">Recommended Events</h3>
+          <p class="fs-3" id="totalEvents"></p>
+        </div>
+        <div id="event-list" class="list-group"></div>
+      </div>
+
+      </div>
+    </div>
+      
     </div>
 
     <!-- JavaScript to handle file upload and display -->
@@ -150,6 +165,8 @@
           const resumeData = await response.json();
           console.log(resumeData)
           displayResumeData(resumeData);
+          displayJobs(resumeData.jobs,resumeData.totalJobs);
+          displayEvents(resumeData.events, resumeData.total_events);
         } catch (error) {
           console.error("Error:", error);
           alert("Error uploading file");
@@ -229,6 +246,52 @@
             .join("");
 
         document.getElementById("score").textContent = data.score || 0;
+      }
+
+      function displayJobs(jobs,total_Jobs) {
+        const jobList = document.getElementById("job-list");
+        jobList.innerHTML = ""; // Clear any previous job listings
+        document.getElementById("jobs-section").style.display = "block";
+
+        const totalJobs = document.getElementById("totalJobs");
+        totalJobs.innerHTML = total_Jobs;
+
+        jobs.forEach((job) => {
+          const jobElement = document.createElement("div");
+          jobElement.classList.add("list-group-item");
+
+          jobElement.innerHTML = `
+            <h5>${job.job_title}</h5>
+            <p><strong>Company:</strong> ${job.employer_name}</p>
+            <p><strong>Match Score:</strong> ${job.match_score}</p>
+            <p><strong>Matching Skills:</strong> ${job.matching_skills}</p>
+            <a href="${job.posting_url}" target="_blank" class="btn btn-link">View Job Posting</a>
+          `;
+
+          jobList.appendChild(jobElement);
+        });
+      }
+    
+      function displayEvents(events, totalEvents) {
+        const eventList = document.getElementById("event-list");
+        eventList.innerHTML = ""; // Clear any previous event listings
+        document.getElementById("events-section").style.display = "block";
+
+        const totalEventsElement = document.getElementById("totalEvents");
+        totalEventsElement.innerHTML = totalEvents;
+
+        events.forEach((event) => {
+          const eventElement = document.createElement("div");
+          eventElement.classList.add("list-group-item");
+
+          eventElement.innerHTML = `
+            <h5>${event['Event Name']}</h5>
+            <p><strong>Event ID:</strong> ${event['Event ID']}</p>
+            <p><strong>Match Score:</strong> ${event['Match Score']}</p>
+          `;
+
+          eventList.appendChild(eventElement);
+        });
       }
     </script>
 

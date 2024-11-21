@@ -1,4 +1,5 @@
-import os
+import jobs_recommendation as jr
+import events_recommendations as er
 import spacy
 from spacy.matcher import Matcher
 import nltk
@@ -67,17 +68,22 @@ def parse_resume(resume_text):
         'projects': [],
         'summary': '',
         'objective': '',
-        'score': 1
+        'score': 1,
+        'jobs':[],
+        'totalJobs':0,
+        'secondary_score':0,
+        'events':[],
+        'total_events':0
     }
 
     # Process resume text
     nlp_text = nlp(resume_text)
-    noun_chunks = list(nlp_text.noun_chunks)
+   
 
     # Extract details using various parser methods
     details['name'] = resume_parser.extract_name(nlp_text, matcher=matcher)
     details['email'] = resume_parser.extract_email(resume_text)
-    details['skills'] = resume_parser.extract_skills(nlp_text, noun_chunks)
+    details['skills'] = resume_parser.extract_skills(resume_text)
     details['education'] = resume_parser.get_education_section(nlp_text)
 
     education_text = resume_parser.get_education_section(nlp_text)
@@ -102,11 +108,12 @@ def parse_resume(resume_text):
     details['bulletPoints'] = resume_parser.count_bullet_points(resume_text)
     sections = resume_parser.extract_entity_sections(nlp_text)
     details['sections'] = sections
-    details['projects'] = resume_parser.get_projects(sections['Projects'])
+    details['projects'] = resume_parser.get_projects(sections['projects'])
     achievements = None
     if "Achievements" in sections:
         achievements = sections["Achievements"]
     details['achievements'] = resume_parser.count_bullet_points(achievements) if achievements else []
+
 
 
     # Extract impact words and calculate impact score
@@ -130,6 +137,25 @@ def parse_resume(resume_text):
     # Calculate the score
     score = scorer.calculate_score()
     details['score'] = score
+
+    #alternative
+    details["secondary_score"] = resume_parser.calculate_score(details)
+
+    #jobs
+    job_list_csv = 'job_listings_latest_skills.csv'
+
+    # Get job recommendations
+    #details['jobs'] = jr.get_job_recommendations(details['skills'], job_list_csv)
+    details['jobs'] = jr.get_job_recommendations_sentence_transformer(resume_text, job_list_csv)
+    details['totalJobs'] = len(details['jobs'])
+
+    #events
+    events_list_csv = "events_list_latest_3.csv"
+
+    #Get job recommendations with salary
+    details['events'] = er.get_event_recommendations_sentence_transformer(resume_text, events_list_csv)
+    details['total_events'] = len(details['events'])
+    
 
     return details
 
