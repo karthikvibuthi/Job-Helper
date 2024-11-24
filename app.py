@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-import app as parsing_module
+import parser as parsing_module
 import post_install
 from events_recommendations import initialize_event_embeddings
 from jobs_recommendation import initialize_job_embeddings
