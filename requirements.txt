@@ -33,6 +33,8 @@ sentence_transformers
 #pdf
 tika
 pyspellchecker
+gunicorn
+
 
 
 #misc

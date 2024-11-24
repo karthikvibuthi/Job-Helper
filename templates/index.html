@@ -122,9 +122,16 @@
       </div>
     </div>
 
+    
+
     <div class="row" id="jobs-filter">
+      <div id="chatbot-section"></div>
+      
+      
 
     </div>
+
+    
     <div class="row">
       <!-- Filters for Job Applications -->
       
@@ -175,7 +182,7 @@
 
       try {
         // First API call for resume details
-        const resumeResponse = await fetch("http://127.0.0.1:5000/api/parse-resume", {
+        const resumeResponse = await fetch("http://127.0.0.1:4000/api/parse-resume", {
           method: "POST",
           body: formData,
         });
@@ -195,7 +202,7 @@
 
         // Second API call for jobs/events
         const matchResponse = await fetch(
-          "http://127.0.0.1:5000/api/match-jobs-events",
+          "http://127.0.0.1:4000/api/match-jobs-events",
           {
             method: "POST",
             body: formData,
@@ -521,7 +528,116 @@
       renderEvents();
     }
 
+    function integrateChatbot() {
+      // Create the button to trigger the chatbot modal
+      var chatbotButton = document.createElement('button');
+      chatbotButton.id = 'chatbot-button';
+      chatbotButton.innerHTML = '🗨️';
+      chatbotButton.title = 'Open Chatbot';
 
+      // Add styles for the chatbot button
+      chatbotButton.style.position = 'fixed';
+      chatbotButton.style.bottom = '20px';
+      chatbotButton.style.right = '20px';
+      chatbotButton.style.backgroundColor = '#25d366'; // WhatsApp-like green
+      chatbotButton.style.color = 'white';
+      chatbotButton.style.border = 'none';
+      chatbotButton.style.borderRadius = '50%';
+      chatbotButton.style.padding = '15px';
+      chatbotButton.style.fontSize = '24px';
+      chatbotButton.style.cursor = 'pointer';
+      chatbotButton.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+      
+      // Append the button to the body
+      document.getElementById('chatbot-section').appendChild(chatbotButton);
+
+      // Create the modal that will contain the chatbot iframe
+      var modal = document.createElement('div');
+      modal.id = 'chatbot-modal';
+      modal.classList.add('modal');
+
+      // Create the modal content container
+      var modalContent = document.createElement('div');
+      modalContent.classList.add('modal-content');
+
+      // Add close button inside the modal
+      var closeButton = document.createElement('span');
+      closeButton.classList.add('close');
+      closeButton.innerHTML = '&times;'; // Close symbol
+      modalContent.appendChild(closeButton);
+
+      // Add the iframe for Dialogflow chatbot
+      var iframe = document.createElement('iframe');
+      iframe.width = '100%';
+      iframe.height = '430';
+      iframe.allow = 'microphone;';
+      iframe.src = 'https://console.dialogflow.com/api-client/demo/embedded/e1545db7-2ce3-4732-8424-183f44326578';
+      modalContent.appendChild(iframe);
+
+      // Append the modal content to the modal container
+      modal.appendChild(modalContent);
+
+      // Append the modal to the body
+      document.body.appendChild(modal);
+
+      // Add the CSS styles for the modal and close button
+      var style = document.createElement('style');
+      style.innerHTML = `
+        .modal {
+          display: none;
+          position: fixed;
+          z-index: 1;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: auto;
+          background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+          position: relative;
+          background-color: #fefefe;
+          margin: 15% auto;
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%;
+          max-width: 600px;
+        }
+        .close {
+          color: #aaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+          cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+          color: black;
+          text-decoration: none;
+        }
+      `;
+      document.head.appendChild(style);
+
+      // When the user clicks the button, open the modal
+      chatbotButton.onclick = function() {
+        modal.style.display = 'block';
+      }
+
+      // When the user clicks the close button, close the modal
+      closeButton.onclick = function() {
+        modal.style.display = 'none';
+      }
+
+      // When the user clicks anywhere outside the modal, close it
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = 'none';
+        }
+      }
+    }
+
+    // Call the function to integrate the chatbot when the page loads
+    window.onload = integrateChatbot;
   </script>
 
   <!-- Bootstrap JS and dependencies -->
