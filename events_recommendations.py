@@ -67,7 +67,7 @@ def get_event_recommendations(resume_skills_list, events_csv):
 
 from sentence_transformers import SentenceTransformer, util
 import pandas as pd
-import torch
+#import torch
 
 # Initialize the SentenceTransformer model globally
 print("Loading SentenceTransformer model...")
@@ -128,21 +128,30 @@ def get_event_recommendations_sentence_transformer(resume_text):
 
     # Calculate cosine similarity between the resume and each event description
     print("Calculating cosine similarity...")
-    similarities = util.pytorch_cos_sim(resume_embedding, encoded_event_embeddings)
-    top_event_indices = torch.topk(similarities, k=25)[1].tolist()[0]
+    cosine_scores = util.cos_sim(resume_embedding, encoded_event_embeddings)
+    #similarities = util.pytorch_cos_sim(resume_embedding, encoded_event_embeddings)
+    #top_event_indices = torch.topk(similarities, k=25)[1].tolist()[0]
 
+    # Prepare a list for event recommendations
     event_recommendations = []
 
-    # Generate event recommendations
-    for event_idx in top_event_indices:
-        event_recommendations.append({
-            'Event ID': int(events_df.iloc[event_idx]['id']),  # Convert to native Python int
-            'Event Name': str(events_df.iloc[event_idx]['Name']),  # Convert to string
-            'Match Score': float(similarities[0][event_idx].item() * 100),  # Convert to native Python float
-            'Registration URL': events_df.iloc[event_idx]['url'] if not pd.isna(events_df.iloc[event_idx]['url']) else '',
-            'Event URL': events_df.iloc[event_idx]['Event URL'] if not pd.isna(events_df.iloc[event_idx]['Event URL']) else ''
-        })
+    # Iterate through each event and calculate match scores
+    for idx, event_row in events_df.iterrows():
+        match_score = cosine_scores[0][idx].item()  # Extract the cosine similarity score
 
+        if match_score > 0.25:  # Threshold for considering a good match
+            event_recommendations.append({
+                'Event ID': int(event_row['id']),  # Convert to native Python int
+                'Event Name': str(event_row['Name']),  # Convert to string
+                'Match Score': float(match_score * 100),  # Convert to native Python float and scale to percentage
+                'Registration URL': event_row['url'] if not pd.isna(event_row['url']) else '',
+                'Event URL': event_row['Event URL'] if not pd.isna(event_row['Event URL']) else ''
+            })
+
+    # Sort recommendations by match score in descending order
     sorted_recommendations = sorted(event_recommendations, key=lambda x: x['Match Score'], reverse=True)
+
     print("Event recommendations generated successfully.")
     return sorted_recommendations
+
+    

@@ -1,59 +1,16 @@
-# core
-setuptools
-wheel
-cython
-numpy
-scipy
-pandas
-scikit-learn
-torch
+# Core Dependencies
+Flask            # For building the Flask API
+pandas           # Data manipulation and analysis
 
-# flask
-Flask
-Flask-Cors
-itsdangerous
-Jinja2
-MarkupSafe
-Werkzeug
+# Natural Language Processing (NLP)
+spacy            # NLP processing
+nltk             # Tokenization, lemmatization, and more
+tika             # For parsing and extracting content from documents
+sentence-transformers # Semantic similarity and embeddings
 
+# Additional NLP Libraries
+spellchecker     # For spell-checking functionality
 
-# nlp_andspacy
-
-blis
-cymem
-preshed
-wasabi
-plac
-srsly
-regex
-spacy
-nltk
-sentence_transformers
-
-#pdf
-tika
+# Utilities
+collections-extended # To handle Counters and defaultdict (alternative to stdlib collections)
 pyspellchecker
-gunicorn
-
-
-
-#misc
-# attrs==22.1.0
-# beautifulsoup4==4.11.1
-# soupsieve==2.3.2.post1
-# ujson==5.4.0
-# dill==0.2.9
-# msgpack==0.6.1
-# msgpack-numpy==0.4.3.2
-# tornado==6.2
-# tqdm==4.64.1
-# decorator==5.1.1
-# toml==0.10.2
-# toolz==0.12.0
-# testpath==0.6.0
-# defusedxml==0.7.1
-# wrapt==1.10.11
-# zipp==3.11.0
-# fastjsonschema==2.16.2
-# packaging==22.0
-# Babel==2.11.0

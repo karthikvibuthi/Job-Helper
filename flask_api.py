@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify, render_template
 import app as parsing_module
+import post_install
 from events_recommendations import initialize_event_embeddings
 from jobs_recommendation import initialize_job_embeddings
+
+post_install.download_spacy_model()
 
 events_list_csv = "events_list_latest_3.csv"
 initialize_event_embeddings(events_list_csv)

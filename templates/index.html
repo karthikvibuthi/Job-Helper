@@ -182,7 +182,7 @@
 
       try {
         // First API call for resume details
-        const resumeResponse = await fetch("http://127.0.0.1:4000/api/parse-resume", {
+        const resumeResponse = await fetch("http://127.0.0.1:5000/api/parse-resume", {
           method: "POST",
           body: formData,
         });
@@ -202,7 +202,7 @@
 
         // Second API call for jobs/events
         const matchResponse = await fetch(
-          "http://127.0.0.1:4000/api/match-jobs-events",
+          "http://127.0.0.1:5000/api/match-jobs-events",
           {
             method: "POST",
             body: formData,

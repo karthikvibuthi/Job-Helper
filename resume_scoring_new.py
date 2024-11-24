@@ -1,13 +1,12 @@
-import os
-import re
 import spacy
 import pandas as pd
 from spacy.matcher import Matcher
 from collections import Counter
+import post_install
 from nltk.corpus import stopwords
 from spellchecker import SpellChecker
 
-
+post_install.download_spacy_model()
 # Load SpaCy model
 nlp = spacy.load("en_core_web_sm")
 
