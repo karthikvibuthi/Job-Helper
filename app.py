@@ -39,7 +39,7 @@ def parse_resume(resume_text):
 
     # Initialize details dictionary with all keys from the updated Resume model
     details = {
-        'name': '',
+        
         'email': '',
         'skills': [],
         'degrees': [],
@@ -81,7 +81,7 @@ def parse_resume(resume_text):
    
 
     # Extract details using various parser methods
-    details['name'] = resume_parser.extract_name(nlp_text, matcher=matcher)
+    #details['name'] = resume_parser.extract_name(nlp_text, matcher=matcher)
     details['email'] = resume_parser.extract_email(resume_text)
     details['skills'] = resume_parser.extract_skills(resume_text)
     details['education'] = resume_parser.get_education_section(nlp_text)

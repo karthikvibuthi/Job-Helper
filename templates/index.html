@@ -40,7 +40,7 @@
           <!-- <div id="basic-info" style="display: none"> -->
             <div id="basic-info" >
             <p><strong>Resume Details</strong></p>
-            <p><strong>Name:</strong> <span id="name"></span></p>
+            <!-- <p><strong>Name:</strong> <span id="name"></span></p> -->
             <p><strong>Email:</strong> <span id="email"></span></p>
             <div id="degrees"></div>
             <div id="majors"></div>
@@ -217,7 +217,7 @@
         document.getElementById("other-info").style.display = "block";
         document.getElementById("jobs-section").style.display = "block";
 
-        document.getElementById("name").textContent = data.name || "N/A";
+        // document.getElementById("name").textContent = data.name || "N/A";
         document.getElementById("email").textContent = data.email || "N/A";
 
         const degrees = data.degrees || [];
