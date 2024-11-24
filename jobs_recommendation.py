@@ -77,7 +77,7 @@ print("Model loaded successfully.")
 encoded_job_embeddings = None
 job_listings_df = None  # To store the job DataFrame for reuse
 
-def initialize_job_embeddings(job_list_csv):
+def initialize_job_embeddings(job_list_csv1,job_list_csv2):
     """
     Preloads and encodes the job descriptions from a CSV file.
 
@@ -91,18 +91,38 @@ def initialize_job_embeddings(job_list_csv):
 
     # Load job listings
     try:
-        job_listings_df = pd.read_csv(job_list_csv)
+        job_listings_df1 = pd.read_csv(job_list_csv1)
     except FileNotFoundError:
-        raise FileNotFoundError(f"Could not find the file: {job_list_csv}")
+        raise FileNotFoundError(f"Could not find the file: {job_list_csv1}")
+    except Exception as e:
+        raise Exception(f"Error loading the CSV file: {str(e)}")
+    
+    try:
+        job_listings_df2 = pd.read_csv(job_list_csv2)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Could not find the file: {job_list_csv2}")
     except Exception as e:
         raise Exception(f"Error loading the CSV file: {str(e)}")
 
-    # Check if the required columns exist in the dataframe
-    required_columns = {'id', 'job_title', 'employer_name', 'posting_url', 'requirements', 'technical_skills'}
-    if not required_columns.issubset(job_listings_df.columns):
-        raise ValueError(f"The job_listings CSV file must contain the following columns: {required_columns}")
 
-    # Encode job descriptions (requirements column)
+    # Define required columns
+    required_columns = {'id', 'job_title', 'employer_name', 'posting_url', 'requirements', 'technical_skills', 'company_type'}
+
+    # Check if required columns exist in both dataframes
+    if not required_columns.issubset(job_listings_df1.columns):
+        raise ValueError(f"The job_listings1 CSV file must contain the following columns: {required_columns}")
+    if not required_columns.issubset(job_listings_df2.columns):
+        raise ValueError(f"The job_listings2 CSV file must contain the following columns: {required_columns}")
+
+    # Retain only the required columns in both dataframes
+    job_listings_df1 = job_listings_df1[list(required_columns)]
+    job_listings_df2 = job_listings_df2[list(required_columns)]
+
+    # Merge the dataframes
+    job_listings_df = pd.concat([job_listings_df1, job_listings_df2], ignore_index=True)
+
+
+    # Encode job descriptions (requirements column)``
     print("Encoding job descriptions...")
     job_descriptions = job_listings_df['requirements'].fillna('').tolist()
     encoded_job_embeddings = model.encode(job_descriptions, convert_to_tensor=True)
@@ -148,6 +168,7 @@ def get_job_recommendations_sentence_transformer(resume_text):
                 'employer_name': job_row['employer_name'],
                 'match_score': match_score,
                 'matching_skills': job_row['technical_skills'] if not pd.isna(job_row['technical_skills']) else '',
+                'company_type': job_row['company_type']
                 
             })
 

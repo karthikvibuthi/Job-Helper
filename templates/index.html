@@ -1,374 +1,533 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Job Helper</title>
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="container mt-4">
-      <!-- Title Row -->
-      <div class="row card">
-        <div class="col text-center">
-          <h2 class="text-primary">Job Helper</h2>
-        </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Helper</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container mt-4">
+    <!-- Title Row -->
+    <div class="row card">
+      <div class="col text-center">
+        <h2 class="text-primary">Job Helper</h2>
       </div>
+    </div>
 
-      <!-- File Upload and Resume Details Row -->
-      <div class="row mt-4 justify-content-between">
-        <!-- File Upload and Basic Information Column (1st column) -->
-        <div class="col-md-4">
-          <div class="mb-3">
-            <label for="fileUpload" class="form-label"
-              >Upload Your Resume (PDF)</label
-            >
-            <input
-              id="fileUpload"
-              type="file"
-              onchange="handleFileUpload(event)"
-              class="form-control"
-              accept=".pdf"
-            />
-          </div>
+    <!-- File Upload and Resume Details Row -->
+    <div class="row mt-4 justify-content-between">
+      <!-- File Upload and Basic Information Column (1st column) -->
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="fileUpload" class="form-label">Upload Your Resume (PDF)</label>
+          <input id="fileUpload" type="file" onchange="handleFileUpload(event)" class="form-control" accept=".pdf" />
+        </div>
 
-          <!-- Resume Basic Information -->
-          <!-- <div id="basic-info" style="display: none"> -->
-            <div id="basic-info" >
-            <p><strong>Resume Details</strong></p>
-            <!-- <p><strong>Name:</strong> <span id="name"></span></p> -->
-            <p><strong>Email:</strong> <span id="email"></span></p>
-            <div id="degrees"></div>
-            <div id="majors"></div>
+        <!-- Resume Basic Information -->
+        <!-- <div id="basic-info" style="display: none"> -->
+        <div id="basic-info">
+          <p><strong>Resume Details</strong></p>
+          <!-- <p><strong>Name:</strong> <span id="name"></span></p> -->
+          <p><strong>Email:</strong> <span id="email"></span></p>
+          <div id="degrees"></div>
+          <div id="majors"></div>
           <div id="education-info">
             <h4>Education</h4>
             <p id="education"></p>
           </div>
-            
-          </div>
 
-          <div id="experience-info">
-            <h4>Experience</h4>
-            <p>
-              <strong>Total Experience:</strong>
-              <span id="total-experience"></span>
-            </p>
-            <p><strong>Designations:</strong> <span id="designations"></span></p>
-            <p>
-              <strong>Companies:</strong>
-              <span id="companies"></span>
-            </p>
-            <h4>Achievements</h4>
-            <ul id="achievements-list"></ul>
-            
-          </div>
-
-          
         </div>
 
-        <!-- Skills Column (2nd column) -->
-         <!-- <div class="col-md-4" id="key-factors" style="display: none"> -->
-        <div class="col-md-4" id="key-factors" >
-          <h4>Key Factors</h4>
-         
-            <h4>Impact Words</h4>
-            <p>
-              <strong>Action Words:</strong> <span id="action-words"></span>
-            </p>
-            <p><strong>Metrics:</strong> <span id="metrics"></span></p>
-            <p><strong>Weak Words:</strong> <span id="weak-words"></span></p>
-            <h4>Buzz Words</h4>
-            <p><strong>Positive:</strong> <span id="positive-buzz"></span></p>
-            <p><strong>Negative:</strong> <span id="negative-buzz"></span></p>
-          <h4>Skills</h4>
-          <div class="row">
-            <ul class="col-6" id="skills-list-left"></ul>
-            <ul class="col-6" id="skills-list-right"></ul>
-          </div>
+        <div id="experience-info">
+          <h4>Experience</h4>
+          <p>
+            <strong>Total Experience:</strong>
+            <span id="total-experience"></span>
+          </p>
+          <p><strong>Designations:</strong> <span id="designations"></span></p>
+          <p>
+            <strong>Companies:</strong>
+            <span id="companies"></span>
+          </p>
+          <h4>Achievements</h4>
+          <ul id="achievements-list"></ul>
+
         </div>
 
 
+      </div>
 
-        <!-- Remaining Details Column (4th column) -->
-        <!-- <div class="col-md-3" id="other-info" style="display: none"> -->
-          <div class="col-md-3" id="other-info" >
-            <div class="score-container">
-              <h4 id="total-score" class="total-score"></h4>
-              <table class="score-table" id="score-breakdown">
-                  <thead>
-                      <tr>
-                          <th><h4>Criteria</h4></th>
-                          <th><h4>Score</h4></th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <!-- Rows will be inserted dynamically -->
-                  </tbody>
-              </table>
-          </div>
-          <h4>Other Details</h4>
-          <p>
-            <strong>Spelling Mistakes:</strong>
-            <span id="spelling-mistakes"></span>
-          </p>
-          <p>
-            <strong>Bullet Points:</strong> <span id="bullet-points"></span>
-          </p>
-          <p>
-            <strong>Resume Length:</strong> <span id="resume-length"></span>
-          </p>
-          <h4>Repeated Words</h4>
-          <ul id="repeated-words-list"></ul>
-          
+      <!-- Skills Column (2nd column) -->
+      <!-- <div class="col-md-4" id="key-factors" style="display: none"> -->
+      <div class="col-md-4" id="key-factors">
+        <h4>Key Factors</h4>
+
+        <h4>Impact Words</h4>
+        <p>
+          <strong>Action Words:</strong> <span id="action-words"></span>
+        </p>
+        <p><strong>Metrics:</strong> <span id="metrics"></span></p>
+        <p><strong>Weak Words:</strong> <span id="weak-words"></span></p>
+        <h4>Buzz Words</h4>
+        <p><strong>Positive:</strong> <span id="positive-buzz"></span></p>
+        <p><strong>Negative:</strong> <span id="negative-buzz"></span></p>
+        <h4>Skills</h4>
+        <div class="row">
+          <ul class="col-6" id="skills-list-left"></ul>
+          <ul class="col-6" id="skills-list-right"></ul>
         </div>
       </div>
 
-      <div class="row">
-        <!-- Jobs Section -->
+
+
+      <!-- Remaining Details Column (4th column) -->
+      <!-- <div class="col-md-3" id="other-info" style="display: none"> -->
+      <div class="col-md-3" id="other-info">
+        <div class="score-container">
+          <h4 id="total-score" class="total-score"></h4>
+          <table class="score-table" id="score-breakdown">
+            <thead>
+              <tr>
+                <th>
+                  <h4>Criteria</h4>
+                </th>
+                <th>
+                  <h4>Score</h4>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Rows will be inserted dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <h4>Other Details</h4>
+        <p>
+          <strong>Spelling Mistakes:</strong>
+          <span id="spelling-mistakes"></span>
+        </p>
+        <p>
+          <strong>Bullet Points:</strong> <span id="bullet-points"></span>
+        </p>
+        <p>
+          <strong>Resume Length:</strong> <span id="resume-length"></span>
+        </p>
+        <h4>Repeated Words</h4>
+        <ul id="repeated-words-list"></ul>
+
+      </div>
+    </div>
+
+    <div class="row" id="jobs-filter">
+
+    </div>
+    <div class="row">
+      <!-- Filters for Job Applications -->
+      
       <div id="jobs-section" class="col-6" style="display: none">
+
+        <!-- Jobs Section -->
+
         <div class="d-flex d-inline-flex align-items-center gap-2">
-          <h3 class="text-secondary">Recommended Jobs</h3><p class="fs-3"id="totalJobs"></p>
+          <h3 class="text-secondary">Recommended Jobs</h3>
+          <p class="fs-3" id="totalJobs"></p>
         </div>
         <div id="job-list" class="list-group"></div>
       </div>
 
-      <!--events Section -->
+
+
+
+
+      <!-- Events Section -->
       <div id="events-section" class="col-6" style="display: none">
         <div class="d-flex d-inline-flex align-items-center gap-2">
           <h3 class="text-secondary">Recommended Events</h3>
           <p class="fs-3" id="totalEvents"></p>
         </div>
         <div id="event-list" class="list-group"></div>
+
+        <!-- Pagination Controls (these will be dynamically added) -->
       </div>
 
-      </div>
+
     </div>
-      
-    </div>
+  </div>
 
-    <!-- JavaScript to handle file upload and display -->
-    <script>
-      async function handleFileUpload(event) {
-          const formData = new FormData();
-          const file = event.target.files[0];
-          
-          if (!file) {
-            alert("Please select a file to upload.");
-            return;
-          }
+  </div>
 
-          formData.append("resume", file);
+  <!-- JavaScript to handle file upload and display -->
+  <script>
+    async function handleFileUpload(event) {
+      const formData = new FormData();
+      const file = event.target.files[0];
 
-          try {
-            // First API call for resume details
-            const resumeResponse = await fetch("http://127.0.0.1:5000/api/parse-resume", {
-              method: "POST",
-              body: formData,
-            });
-
-            if (!resumeResponse.ok) {
-              const errorData = await resumeResponse.json();
-              alert(errorData.error || "Failed to fetch resume details");
-              return;
-            }
-
-            const resumeData = await resumeResponse.json();
-            console.log("Resume Details:", resumeData);
-
-            // Display resume details
-            displayResumeData(resumeData);
-            displayScores(resumeData.scores);
-
-            // Second API call for jobs/events
-            const matchResponse = await fetch(
-              "http://127.0.0.1:5000/api/match-jobs-events",
-              {
-                method: "POST",
-                body: formData,
-              }
-            );
-
-            if (!matchResponse.ok) {
-              const errorData = await matchResponse.json();
-              alert(errorData.error || "Failed to fetch job/event recommendations");
-              return;
-            }
-
-            const matchData = await matchResponse.json();
-            console.log("Job/Event Recommendations:", matchData);
-
-            // Display job and event recommendations
-            displayJobs(matchData.jobs, matchData.totalJobs);
-            displayEvents(matchData.events, matchData.totalEvents);
-          } catch (error) {
-            console.error("Error:", error);
-            alert("Error uploading and processing resume");
-          }
-        }
-
-
-      function displayResumeData(data) {
-        document.getElementById("basic-info").style.display = "block";
-        document.getElementById("key-factors").style.display = "block";
-        document.getElementById("other-info").style.display = "block";
-        document.getElementById("jobs-section").style.display = "block";
-
-        // document.getElementById("name").textContent = data.name || "N/A";
-        document.getElementById("email").textContent = data.email || "N/A";
-
-        const degrees = data.degrees || [];
-        document.getElementById("degrees").innerHTML = degrees
-          .map((degree) => `<p><strong>Degree:</strong> ${degree}</p>`)
-          .join(" ");
-
-        const majors = data.majors || [];
-        document.getElementById("majors").innerHTML = majors
-          .map((major) => `<p><strong>Major:</strong> ${major}</p>`)
-          .join("");
-
-        document.getElementById("designations").textContent =
-          data.designations?.join(", ") || "N/A";
-
-        document.getElementById("total-experience").textContent =
-          data.totalExperience || 0;
-
-        const companies = data.companies || [];
-
-        document.getElementById("companies").textContent =
-        data.companies?.join(", ") || "N/A";
-  
-
-        const achievements = data.achievements || [];
-        document.getElementById("achievements-list").innerHTML = 
-          achievements || 0;
-
-        document.getElementById("action-words").textContent =
-          data.impactWords?.action_words.join(", ") || "N/A";
-        document.getElementById("spelling-mistakes").innerHTML = data.spellingMistakes || 0 ;
-        document.getElementById("metrics").textContent =
-          data.impactWords?.metrics.join(", ") || "N/A";
-        document.getElementById("weak-words").textContent =
-          data.impactWords?.weak_words.join(", ") || "N/A";
-
-        document.getElementById("positive-buzz").textContent =
-          data.positiveBuzzwords?.join(", ") || "N/A";
-        document.getElementById("negative-buzz").textContent =
-          data.negativeBuzzwords?.join(", ") || "N/A";
-
-        document.getElementById("education").textContent =
-          data.education || "N/A";
-
-        const skills = data.skills || [];
-        const midIndex = Math.ceil(skills.length / 2);
-        const skillsLeft = skills.slice(0, midIndex);
-        const skillsRight = skills.slice(midIndex);
-
-        document.getElementById("skills-list-left").innerHTML = skillsLeft
-          .map((skill) => `<li>${skill}</li>`)
-          .join("");
-        document.getElementById("skills-list-right").innerHTML = skillsRight
-          .map((skill) => `<li>${skill}</li>`)
-          .join("");
-
-        document.getElementById("bullet-points").textContent =
-          data.bulletPoints || 0;
-        document.getElementById("resume-length").textContent = data.length || 0;
-
-        document.getElementById("repeated-words-list").innerHTML =
-          Object.entries(data.repeatedWords || {})
-            .map(([word, count]) => `<li>${word}: ${count}</li>`)
-            .join("");
-
+      if (!file) {
+        alert("Please select a file to upload.");
+        return;
       }
 
-      function displayJobs(jobs,total_Jobs) {
+      formData.append("resume", file);
+
+      try {
+        // First API call for resume details
+        const resumeResponse = await fetch("http://127.0.0.1:5000/api/parse-resume", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!resumeResponse.ok) {
+          const errorData = await resumeResponse.json();
+          alert(errorData.error || "Failed to fetch resume details");
+          return;
+        }
+
+        const resumeData = await resumeResponse.json();
+        console.log("Resume Details:", resumeData);
+
+        // Display resume details
+        displayResumeData(resumeData);
+        displayScores(resumeData.scores);
+
+        // Second API call for jobs/events
+        const matchResponse = await fetch(
+          "http://127.0.0.1:5000/api/match-jobs-events",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!matchResponse.ok) {
+          const errorData = await matchResponse.json();
+          alert(errorData.error || "Failed to fetch job/event recommendations");
+          return;
+        }
+
+        const matchData = await matchResponse.json();
+        console.log("Job/Event Recommendations:", matchData);
+
+        // Display job and event recommendations
+        displayJobs(matchData.jobs, matchData.totalJobs);
+        displayEvents(matchData.events, matchData.totalEvents);
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error uploading and processing resume");
+      }
+    }
+
+
+    function displayResumeData(data) {
+      document.getElementById("basic-info").style.display = "block";
+      document.getElementById("key-factors").style.display = "block";
+      document.getElementById("other-info").style.display = "block";
+      document.getElementById("jobs-section").style.display = "block";
+
+      // document.getElementById("name").textContent = data.name || "N/A";
+      document.getElementById("email").textContent = data.email || "N/A";
+
+      const degrees = data.degrees || [];
+      document.getElementById("degrees").innerHTML = degrees
+        .map((degree) => `<p><strong>Degree:</strong> ${degree}</p>`)
+        .join(" ");
+
+      const majors = data.majors || [];
+      document.getElementById("majors").innerHTML = majors
+        .map((major) => `<p><strong>Major:</strong> ${major}</p>`)
+        .join("");
+
+      document.getElementById("designations").textContent =
+        data.designations?.join(", ") || "N/A";
+
+      document.getElementById("total-experience").textContent =
+        data.totalExperience || 0;
+
+      const companies = data.companies || [];
+
+      document.getElementById("companies").textContent =
+        data.companies?.join(", ") || "N/A";
+
+
+      const achievements = data.achievements || [];
+      document.getElementById("achievements-list").innerHTML =
+        achievements || 0;
+
+      document.getElementById("action-words").textContent =
+        data.impactWords?.action_words.join(", ") || "N/A";
+      document.getElementById("spelling-mistakes").innerHTML = data.spellingMistakes || 0;
+      document.getElementById("metrics").textContent =
+        data.impactWords?.metrics.join(", ") || "N/A";
+      document.getElementById("weak-words").textContent =
+        data.impactWords?.weak_words.join(", ") || "N/A";
+
+      document.getElementById("positive-buzz").textContent =
+        data.positiveBuzzwords?.join(", ") || "N/A";
+      document.getElementById("negative-buzz").textContent =
+        data.negativeBuzzwords?.join(", ") || "N/A";
+
+      document.getElementById("education").textContent =
+        data.education || "N/A";
+
+      const skills = data.skills || [];
+      const midIndex = Math.ceil(skills.length / 2);
+      const skillsLeft = skills.slice(0, midIndex);
+      const skillsRight = skills.slice(midIndex);
+
+      document.getElementById("skills-list-left").innerHTML = skillsLeft
+        .map((skill) => `<li>${skill}</li>`)
+        .join("");
+      document.getElementById("skills-list-right").innerHTML = skillsRight
+        .map((skill) => `<li>${skill}</li>`)
+        .join("");
+
+      document.getElementById("bullet-points").textContent =
+        data.bulletPoints || 0;
+      document.getElementById("resume-length").textContent = data.length || 0;
+
+      document.getElementById("repeated-words-list").innerHTML =
+        Object.entries(data.repeatedWords || {})
+          .map(([word, count]) => `<li>${word}: ${count}</li>`)
+          .join("");
+
+    }
+
+
+    function displayJobs(jobs, totalJobs) {
+      let filteredJobs = jobs; // Filtered jobs based on company_type
+      let currentPage = 1; // Start with the first page
+      const jobsPerPage = 5; // Number of jobs per page
+
+      // Create filter dropdown
+      const filterSection = document.createElement("div");
+      filterSection.classList.add("filter-section", "mb-3");
+
+      filterSection.innerHTML = `
+        <label for="companyTypeFilter" class="form-label">Filter by Company Type:</label>
+        <select id="companyTypeFilter" class="form-select">
+            <option value="all">All</option>
+            <option value="Handshake">Handshake</option>
+            <option value="Startup">Startup</option>
+        </select>
+    `;
+      document.getElementById("jobs-filter").appendChild(filterSection);
+
+      // Function to render paginated jobs
+      function renderJobs() {
         const jobList = document.getElementById("job-list");
-        jobList.innerHTML = ""; // Clear any previous job listings
-        document.getElementById("jobs-section").style.display = "block";
+        jobList.innerHTML = ""; // Clear the list before rendering
 
-        const totalJobs = document.getElementById("totalJobs");
-        totalJobs.innerHTML = total_Jobs;
 
-        jobs.forEach((job) => {
+
+        // Calculate jobs for the current page
+        const startIndex = (currentPage - 1) * jobsPerPage;
+        const endIndex = Math.min(startIndex + jobsPerPage, filteredJobs.length);
+
+        for (let i = startIndex; i < endIndex; i++) {
+          const job = filteredJobs[i];
+          // Round match score to 1 decimal place and add a % symbol
+          const roundedScore = (Math.round(job['match_score'] * 100)).toFixed(1);
+          let scoreColor = "";
+
+          // Determine color coding based on match score
+          if (roundedScore > 80) {
+            scoreColor = "green";
+          } else if (roundedScore >= 60 && roundedScore <= 80) {
+            scoreColor = "orange";
+          } else if (roundedScore >= 30 && roundedScore < 60) {
+            scoreColor = "purple";
+          } else {
+            scoreColor = "red"; // Optional for scores below 30
+          }
           const jobElement = document.createElement("div");
           jobElement.classList.add("list-group-item");
 
           jobElement.innerHTML = `
-            <h5>${job.job_title}</h5>
-            <p><strong>Company:</strong> ${job.employer_name}</p>
-            <p><strong>Match Score:</strong> ${job.match_score}</p>
-            <p><strong>Matching Skills:</strong> ${job.matching_skills}</p>
-            <a href="${job.posting_url}" target="_blank" class="btn btn-link">View Job Posting</a>
-          `;
+                <h5>${job['job_title']}</h5>
+                <p><strong>Job ID:</strong> ${job['id']}</p>
+                <p><strong>Match Score:</strong> <span style="color:${scoreColor}">${roundedScore}%</span></p>
+                <p><strong>Employer Name:</strong> ${job['employer_name']}</p>
+                <p><strong>Company Type:</strong> ${job['company_type']}</p>
+                <p><strong>Matching Skills:</strong> ${job['matching_skills']}</p>
+                <p><strong>Posting URL:</strong> <a href="${job['posting_url']}" target="_blank">${job['posting_url']}</a></p>
+            `;
 
           jobList.appendChild(jobElement);
-        });
-      }
-
-      function displayScores(scores) {
-            // Extract total score and breakdown
-            const totalScore = scores.total_score;
-            const breakdown = scores.breakdown;
-
-            // Update total score display
-            const totalScoreElement = document.getElementById('total-score');
-            totalScoreElement.textContent = `Total Score: ${totalScore}`;
-
-            // Get the table body for the breakdown
-            const tableBody = document.getElementById('score-breakdown').querySelector('tbody');
-
-            // Clear any existing rows
-            tableBody.innerHTML = '';
-
-            // Populate the breakdown table
-            for (const [criteria, score] of Object.entries(breakdown)) {
-                const row = document.createElement('tr');
-                
-                const criteriaCell = document.createElement('td');
-                criteriaCell.textContent = criteria.replace(/_/g, ' '); // Replace underscores with spaces
-                
-                const scoreCell = document.createElement('td');
-                scoreCell.textContent = score;
-
-                row.appendChild(criteriaCell);
-                row.appendChild(scoreCell);
-                tableBody.appendChild(row);
-            }
         }
-    
-     function displayEvents(events, totalEvents) {
-          const eventList = document.getElementById("event-list");
-          eventList.innerHTML = ""; // Clear any previous event listings
-          document.getElementById("events-section").style.display = "block";
 
-          const totalEventsElement = document.getElementById("totalEvents");
-          totalEventsElement.innerHTML = totalEvents;
-
-          events.forEach((event) => {
-              const eventElement = document.createElement("div");
-              eventElement.classList.add("list-group-item");
-
-              eventElement.innerHTML = `
-                  <h5>${event['Event Name']}</h5>
-                  <p><strong>Event ID:</strong> ${event['Event ID']}</p>
-                  <p><strong>Match Score:</strong> ${event['Match Score']}</p>
-                  <p><strong>Registration URL:</strong> <a href="${event['Registration URL']}" target="_blank">${event['Registration URL']}</a></p>
-                  <p><strong>Event URL:</strong> <a href="${event['Event URL']}" target="_blank">${event['Event URL']}</a></p>
-              `;
-
-              eventList.appendChild(eventElement);
-          });
+        // Update pagination controls
+        document.getElementById("currentPageJobs").innerText = `Page ${currentPage}`;
+        document.getElementById("prevPageJobs").disabled = currentPage === 1;
+        document.getElementById("nextPageJobs").disabled = endIndex >= filteredJobs.length;
       }
 
-    </script>
+      // Create pagination controls after jobs are displayed
+      const paginationControls = document.createElement("div");
+      paginationControls.classList.add("pagination-controls-jobs", "d-flex", "justify-content-between", "align-items-center", "mt-3");
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  </body>
+      paginationControls.innerHTML = `
+        <button id="prevPageJobs" class="btn btn-secondary" disabled>Previous</button>
+        <span id="currentPageJobs">Page 1</span>
+        <button id="nextPageJobs" class="btn btn-secondary">Next</button>
+    `;
+      document.getElementById("jobs-section").appendChild(paginationControls);
+
+      // Function to apply filters
+      function applyFilters() {
+        const selectedFilter = document.getElementById("companyTypeFilter").value;
+
+        if (selectedFilter === "all") {
+          filteredJobs = jobs;
+        } else {
+          filteredJobs = jobs.filter(job => job['company_type'] === selectedFilter); // Ensure company_type exists in the data
+        }
+
+        currentPage = 1; // Reset to the first page
+        renderJobs();
+      }
+
+      // Event listeners for filters and pagination
+      document.getElementById("companyTypeFilter").addEventListener("change", applyFilters);
+      document.getElementById("prevPageJobs").addEventListener("click", () => {
+        currentPage -= 1;
+        renderJobs();
+      });
+      document.getElementById("nextPageJobs").addEventListener("click", () => {
+        currentPage += 1;
+        renderJobs();
+      });
+
+      // Initial render
+      document.getElementById("jobs-section").style.display = "block";
+      document.getElementById("totalJobs").innerText = totalJobs;
+      renderJobs();
+    }
+
+
+
+    function displayScores(scores) {
+      // Extract total score and breakdown
+      const totalScore = scores.total_score;
+      const breakdown = scores.breakdown;
+
+      // Update total score display
+      const totalScoreElement = document.getElementById('total-score');
+      totalScoreElement.textContent = `Total Score: ${totalScore}`;
+
+      // Get the table body for the breakdown
+      const tableBody = document.getElementById('score-breakdown').querySelector('tbody');
+
+      // Clear any existing rows
+      tableBody.innerHTML = '';
+
+      // Populate the breakdown table
+      for (const [criteria, score] of Object.entries(breakdown)) {
+        const row = document.createElement('tr');
+
+        const criteriaCell = document.createElement('td');
+        criteriaCell.textContent = criteria.replace(/_/g, ' '); // Replace underscores with spaces
+
+        const scoreCell = document.createElement('td');
+        scoreCell.textContent = score;
+
+        row.appendChild(criteriaCell);
+        row.appendChild(scoreCell);
+        tableBody.appendChild(row);
+      }
+    }
+
+    function displayEvents(events, totalEvents) {
+      let currentPage = 1; // Start with page 1
+      const eventsPerPage = 5; // Number of events per page
+      const totalPages = Math.ceil(totalEvents / eventsPerPage); // Total number of pages
+
+      // Create pagination controls
+      const paginationControls = document.createElement("div");
+      paginationControls.classList.add("pagination-controls-events", "d-flex", "justify-content-between", "align-items-center", "mt-3");
+
+      paginationControls.innerHTML = `
+        <button id="prevPageEvents" class="btn btn-secondary" disabled>Previous</button>
+        <span id="currentPageEvents">Page 1 of ${totalPages}</span>
+        <button id="nextPageEvents" class="btn btn-secondary">Next</button>
+    `;
+      document.getElementById("events-section").appendChild(paginationControls);
+
+      // Function to render the events for the current page
+      function renderEvents() {
+        const eventList = document.getElementById("event-list");
+        eventList.innerHTML = ""; // Clear the list before rendering
+
+        const startIndex = (currentPage - 1) * eventsPerPage;
+        const endIndex = Math.min(startIndex + eventsPerPage, totalEvents);
+        const eventsToDisplay = events.slice(startIndex, endIndex);
+
+        eventsToDisplay.forEach((event) => {
+          const eventElement = document.createElement("div");
+          eventElement.classList.add("list-group-item");
+
+          // Round match score to 1 decimal place and add a % symbol
+          const roundedScore = (Math.round(event['Match Score'])).toFixed(1);
+          let scoreColor = "";
+
+          // Determine color coding based on match score
+          if (roundedScore > 80) {
+            scoreColor = "green";
+          } else if (roundedScore >= 60 && roundedScore <= 80) {
+            scoreColor = "orange";
+          } else if (roundedScore >= 30 && roundedScore < 60) {
+            scoreColor = "purple";
+          } else {
+            scoreColor = "red"; // Optional for scores below 30
+          }
+
+          eventElement.innerHTML = `
+                <h5>${event['Event Name']}</h5>
+                <p><strong>Event ID:</strong> ${event['Event ID']}</p>
+                <p><strong>Match Score:</strong> <span style="color:${scoreColor}">${roundedScore}%</span></p>
+                <p><strong>Registration URL:</strong> <a href="${event['Registration URL']}" target="_blank">${event['Registration URL']}</a></p>
+                <p><strong>Event URL:</strong> <a href="${event['Event URL']}" target="_blank">${event['Event URL']}</a></p>
+            `;
+
+          eventList.appendChild(eventElement);
+        });
+
+        // Update pagination controls
+        document.getElementById("currentPageEvents").innerText = `Page ${currentPage} of ${totalPages}`;
+        document.getElementById("prevPageEvents").disabled = currentPage === 1;
+        document.getElementById("nextPageEvents").disabled = currentPage === totalPages;
+      }
+
+      // Event listeners for pagination controls
+      document.getElementById("prevPageEvents").addEventListener("click", () => {
+        if (currentPage > 1) {
+          currentPage -= 1;
+          renderEvents();
+        }
+      });
+
+      document.getElementById("nextPageEvents").addEventListener("click", () => {
+        if (currentPage < totalPages) {
+          currentPage += 1;
+          renderEvents();
+        }
+      });
+
+      // Initial render
+      document.getElementById("events-section").style.display = "block";
+      document.getElementById("totalEvents").innerText = totalEvents;
+      renderEvents();
+    }
+
+
+  </script>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
 </html>

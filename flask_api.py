@@ -6,8 +6,9 @@ from jobs_recommendation import initialize_job_embeddings
 events_list_csv = "events_list_latest_3.csv"
 initialize_event_embeddings(events_list_csv)
 
-job_list_csv = 'job_listings_latest_skills.csv'
-initialize_job_embeddings(job_list_csv)
+job_list_csv1 = 'job_listings_latest_skills.csv'
+job_list_csv2 = 'wefound-job-listings.csv'
+initialize_job_embeddings(job_list_csv1,job_list_csv2)
 app = Flask(__name__)
 
 @app.route('/')
