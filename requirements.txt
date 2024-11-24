@@ -14,3 +14,4 @@ spellchecker     # For spell-checking functionality
 # Utilities
 collections-extended # To handle Counters and defaultdict (alternative to stdlib collections)
 pyspellchecker
+gunicorn
