@@ -65,28 +65,30 @@ def get_event_recommendations(resume_skills_list, events_csv):
     
     return sorted_recommendations
 
-
 from sentence_transformers import SentenceTransformer, util
 import pandas as pd
 import torch
 
-# Initialize the model globally to avoid reloading it every time the function is called
+# Initialize the SentenceTransformer model globally
 print("Loading SentenceTransformer model...")
 model = SentenceTransformer('all-MiniLM-L6-v2')
 print("Model loaded successfully.")
 
-def get_event_recommendations_sentence_transformer(resume_text, events_csv):
-    """
-    Generates event recommendations based on cosine similarity of Sentence-BERT embeddings.
+# Global variable to store encoded events
+encoded_event_embeddings = None
+events_df = None  # To store the loaded events DataFrame for later use
 
+def initialize_event_embeddings(events_csv):
+    """
+    Preloads and encodes the event descriptions from a CSV file.
+    
     Parameters:
-    resume_text (list of str): A list of skills or relevant text from the resume.
     events_csv (str): Path to the event listings CSV file.
 
     Returns:
-    list of dict: A list of event recommendations sorted by match score, each containing:
-                  id, posting_url, event_name, match_score.
+    None: The function updates the global `encoded_event_embeddings` and `events_df`.
     """
+    global encoded_event_embeddings, events_df
 
     # Load event listings
     try:
@@ -96,32 +98,51 @@ def get_event_recommendations_sentence_transformer(resume_text, events_csv):
     except Exception as e:
         raise Exception(f"Error loading the CSV file: {str(e)}")
 
+    # Encode event descriptions
+    print("Encoding event descriptions...")
+    encoded_event_embeddings = model.encode(events_df['description'].tolist(), convert_to_tensor=True)
+    print("Event descriptions encoding complete and stored globally.")
+
+
+def get_event_recommendations_sentence_transformer(resume_text):
+    """
+    Generates event recommendations based on cosine similarity of Sentence-BERT embeddings.
+
+    Parameters:
+    resume_text (list of str): A list of skills or relevant text from the resume.
+
+    Returns:
+    list of dict: A list of event recommendations sorted by match score, each containing:
+                  id, posting_url, event_name, match_score.
+    """
+    global encoded_event_embeddings, events_df
+
+    # Check if event embeddings have been initialized
+    if encoded_event_embeddings is None or events_df is None:
+        raise ValueError("Event embeddings are not initialized. Call `initialize_event_embeddings` first.")
+
     # Encode the resume text
     print("Encoding resume text...")
     resume_embedding = model.encode(resume_text, convert_to_tensor=True)
     print("Resume encoding complete.")
 
-    # Encode event descriptions
-    print("Encoding event descriptions...")
-    event_embeddings = model.encode(events_df['description'].tolist(), convert_to_tensor=True)
-    print("Event descriptions encoding complete.")
-
     # Calculate cosine similarity between the resume and each event description
     print("Calculating cosine similarity...")
-    # Compute similarity scores
-    similarities = util.pytorch_cos_sim(resume_embedding, event_embeddings)
+    similarities = util.pytorch_cos_sim(resume_embedding, encoded_event_embeddings)
     top_event_indices = torch.topk(similarities, k=25)[1].tolist()[0]
 
     event_recommendations = []
 
-    # Use correct column names based on your dataset
+    # Generate event recommendations
     for event_idx in top_event_indices:
         event_recommendations.append({
             'Event ID': int(events_df.iloc[event_idx]['id']),  # Convert to native Python int
             'Event Name': str(events_df.iloc[event_idx]['Name']),  # Convert to string
-            'Match Score': float(similarities[0][event_idx].item() * 100)  # Convert to native Python float
+            'Match Score': float(similarities[0][event_idx].item() * 100),  # Convert to native Python float
+            'Registration URL': events_df.iloc[event_idx]['url'] if not pd.isna(events_df.iloc[event_idx]['url']) else '',
+            'Event URL': events_df.iloc[event_idx]['Event URL'] if not pd.isna(events_df.iloc[event_idx]['Event URL']) else ''
         })
 
     sorted_recommendations = sorted(event_recommendations, key=lambda x: x['Match Score'], reverse=True)
-
+    print("Event recommendations generated successfully.")
     return sorted_recommendations

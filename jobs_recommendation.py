@@ -68,23 +68,26 @@ def get_job_recommendations(resume_skills_list, job_list_csv):
 from sentence_transformers import SentenceTransformer, util
 import pandas as pd
 
-# Initialize the model globally to avoid reloading it every time the function is called
+# Initialize the SentenceTransformer model globally
 print("Loading SentenceTransformer model...")
 model = SentenceTransformer('all-MiniLM-L6-v2')
 print("Model loaded successfully.")
 
-def get_job_recommendations_sentence_transformer(resume_text, job_list_csv):
+# Global variables to store precomputed embeddings and job listings
+encoded_job_embeddings = None
+job_listings_df = None  # To store the job DataFrame for reuse
+
+def initialize_job_embeddings(job_list_csv):
     """
-    Generates job recommendations based on cosine similarity of Sentence-BERT embeddings.
+    Preloads and encodes the job descriptions from a CSV file.
 
     Parameters:
-    resume_text (list of str): A list of skills or relevant text from the resume.
     job_list_csv (str): Path to the job listings CSV file.
 
     Returns:
-    list of dict: A list of job recommendations sorted by match score, each containing:
-                  id, posting_url, job_title, employer_name, match_score, and matching_skills.
+    None: The function updates the global `encoded_job_embeddings` and `job_listings_df`.
     """
+    global encoded_job_embeddings, job_listings_df
 
     # Load job listings
     try:
@@ -95,24 +98,42 @@ def get_job_recommendations_sentence_transformer(resume_text, job_list_csv):
         raise Exception(f"Error loading the CSV file: {str(e)}")
 
     # Check if the required columns exist in the dataframe
-    required_columns = {'id', 'job_title', 'employer_name', 'posting_url', 'technical_skills'}
+    required_columns = {'id', 'job_title', 'employer_name', 'posting_url', 'requirements', 'technical_skills'}
     if not required_columns.issubset(job_listings_df.columns):
         raise ValueError(f"The job_listings CSV file must contain the following columns: {required_columns}")
+
+    # Encode job descriptions (requirements column)
+    print("Encoding job descriptions...")
+    job_descriptions = job_listings_df['requirements'].fillna('').tolist()
+    encoded_job_embeddings = model.encode(job_descriptions, convert_to_tensor=True)
+    print("Job descriptions encoding complete and stored globally.")
+
+
+def get_job_recommendations_sentence_transformer(resume_text):
+    """
+    Generates job recommendations based on cosine similarity of Sentence-BERT embeddings.
+
+    Parameters:
+    resume_text (list of str): A list of skills or relevant text from the resume.
+
+    Returns:
+    list of dict: A list of job recommendations sorted by match score, each containing:
+                  id, posting_url, job_title, employer_name, match_score, and matching_skills.
+    """
+    global encoded_job_embeddings, job_listings_df
+
+    # Check if job embeddings have been initialized
+    if encoded_job_embeddings is None or job_listings_df is None:
+        raise ValueError("Job embeddings are not initialized. Call `initialize_job_embeddings` first.")
 
     # Encode the resume text
     print("Encoding resume text...")
     resume_embedding = model.encode(resume_text, convert_to_tensor=True)
     print("Resume encoding complete.")
 
-    # Encode job descriptions (technical_skills column)
-    print("Encoding job descriptions...")
-    job_descriptions = job_listings_df['requirements'].fillna('').tolist()
-    job_embeddings = model.encode(job_descriptions, convert_to_tensor=True)
-    print("Job descriptions encoding complete.")
-
     # Calculate cosine similarity between the resume and each job description
     print("Calculating cosine similarity...")
-    cosine_scores = util.cos_sim(resume_embedding, job_embeddings)
+    cosine_scores = util.cos_sim(resume_embedding, encoded_job_embeddings)
 
     # Prepare job recommendations
     job_recommendations = []
@@ -126,7 +147,8 @@ def get_job_recommendations_sentence_transformer(resume_text, job_list_csv):
                 'job_title': job_row['job_title'],
                 'employer_name': job_row['employer_name'],
                 'match_score': match_score,
-                'matching_skills': job_row['technical_skills'] if not pd.isna(job_row['technical_skills']) else ''  
+                'matching_skills': job_row['technical_skills'] if not pd.isna(job_row['technical_skills']) else '',
+                
             })
 
     # Sort recommendations by match score in descending order and return the results

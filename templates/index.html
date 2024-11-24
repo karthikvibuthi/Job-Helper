@@ -30,7 +30,7 @@
             <input
               id="fileUpload"
               type="file"
-              onchange="onFileSelected(event)"
+              onchange="handleFileUpload(event)"
               class="form-control"
               accept=".pdf"
             />
@@ -96,6 +96,20 @@
         <!-- Remaining Details Column (4th column) -->
         <!-- <div class="col-md-3" id="other-info" style="display: none"> -->
           <div class="col-md-3" id="other-info" >
+            <div class="score-container">
+              <h4 id="total-score" class="total-score"></h4>
+              <table class="score-table" id="score-breakdown">
+                  <thead>
+                      <tr>
+                          <th><h4>Criteria</h4></th>
+                          <th><h4>Score</h4></th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <!-- Rows will be inserted dynamically -->
+                  </tbody>
+              </table>
+          </div>
           <h4>Other Details</h4>
           <p>
             <strong>Spelling Mistakes:</strong>
@@ -109,7 +123,7 @@
           </p>
           <h4>Repeated Words</h4>
           <ul id="repeated-words-list"></ul>
-          <p><strong>Score:</strong> <span id="score"></span></p>
+          
         </div>
       </div>
 
@@ -138,40 +152,64 @@
 
     <!-- JavaScript to handle file upload and display -->
     <script>
-      async function onFileSelected(event) {
-        const formData = new FormData();
-        const file = event.target.files[0];
-        if (!file) {
-          alert("Please select a file to upload.");
-          return;
-        }
-        formData.append("resume", file);
-
-        try {
-          const response = await fetch(
-            "http://127.0.0.1:5000/api/parse-resume",
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            alert(errorData.error || "Failed to upload file");
+      async function handleFileUpload(event) {
+          const formData = new FormData();
+          const file = event.target.files[0];
+          
+          if (!file) {
+            alert("Please select a file to upload.");
             return;
           }
 
-          const resumeData = await response.json();
-          console.log(resumeData)
-          displayResumeData(resumeData);
-          displayJobs(resumeData.jobs,resumeData.totalJobs);
-          displayEvents(resumeData.events, resumeData.total_events);
-        } catch (error) {
-          console.error("Error:", error);
-          alert("Error uploading file");
+          formData.append("resume", file);
+
+          try {
+            // First API call for resume details
+            const resumeResponse = await fetch("http://127.0.0.1:5000/api/parse-resume", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!resumeResponse.ok) {
+              const errorData = await resumeResponse.json();
+              alert(errorData.error || "Failed to fetch resume details");
+              return;
+            }
+
+            const resumeData = await resumeResponse.json();
+            console.log("Resume Details:", resumeData);
+
+            // Display resume details
+            displayResumeData(resumeData);
+            displayScores(resumeData.scores);
+
+            // Second API call for jobs/events
+            const matchResponse = await fetch(
+              "http://127.0.0.1:5000/api/match-jobs-events",
+              {
+                method: "POST",
+                body: formData,
+              }
+            );
+
+            if (!matchResponse.ok) {
+              const errorData = await matchResponse.json();
+              alert(errorData.error || "Failed to fetch job/event recommendations");
+              return;
+            }
+
+            const matchData = await matchResponse.json();
+            console.log("Job/Event Recommendations:", matchData);
+
+            // Display job and event recommendations
+            displayJobs(matchData.jobs, matchData.totalJobs);
+            displayEvents(matchData.events, matchData.totalEvents);
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Error uploading and processing resume");
+          }
         }
-      }
+
 
       function displayResumeData(data) {
         document.getElementById("basic-info").style.display = "block";
@@ -245,7 +283,6 @@
             .map(([word, count]) => `<li>${word}: ${count}</li>`)
             .join("");
 
-        document.getElementById("score").textContent = data.score || 0;
       }
 
       function displayJobs(jobs,total_Jobs) {
@@ -271,28 +308,62 @@
           jobList.appendChild(jobElement);
         });
       }
+
+      function displayScores(scores) {
+            // Extract total score and breakdown
+            const totalScore = scores.total_score;
+            const breakdown = scores.breakdown;
+
+            // Update total score display
+            const totalScoreElement = document.getElementById('total-score');
+            totalScoreElement.textContent = `Total Score: ${totalScore}`;
+
+            // Get the table body for the breakdown
+            const tableBody = document.getElementById('score-breakdown').querySelector('tbody');
+
+            // Clear any existing rows
+            tableBody.innerHTML = '';
+
+            // Populate the breakdown table
+            for (const [criteria, score] of Object.entries(breakdown)) {
+                const row = document.createElement('tr');
+                
+                const criteriaCell = document.createElement('td');
+                criteriaCell.textContent = criteria.replace(/_/g, ' '); // Replace underscores with spaces
+                
+                const scoreCell = document.createElement('td');
+                scoreCell.textContent = score;
+
+                row.appendChild(criteriaCell);
+                row.appendChild(scoreCell);
+                tableBody.appendChild(row);
+            }
+        }
     
-      function displayEvents(events, totalEvents) {
-        const eventList = document.getElementById("event-list");
-        eventList.innerHTML = ""; // Clear any previous event listings
-        document.getElementById("events-section").style.display = "block";
+     function displayEvents(events, totalEvents) {
+          const eventList = document.getElementById("event-list");
+          eventList.innerHTML = ""; // Clear any previous event listings
+          document.getElementById("events-section").style.display = "block";
 
-        const totalEventsElement = document.getElementById("totalEvents");
-        totalEventsElement.innerHTML = totalEvents;
+          const totalEventsElement = document.getElementById("totalEvents");
+          totalEventsElement.innerHTML = totalEvents;
 
-        events.forEach((event) => {
-          const eventElement = document.createElement("div");
-          eventElement.classList.add("list-group-item");
+          events.forEach((event) => {
+              const eventElement = document.createElement("div");
+              eventElement.classList.add("list-group-item");
 
-          eventElement.innerHTML = `
-            <h5>${event['Event Name']}</h5>
-            <p><strong>Event ID:</strong> ${event['Event ID']}</p>
-            <p><strong>Match Score:</strong> ${event['Match Score']}</p>
-          `;
+              eventElement.innerHTML = `
+                  <h5>${event['Event Name']}</h5>
+                  <p><strong>Event ID:</strong> ${event['Event ID']}</p>
+                  <p><strong>Match Score:</strong> ${event['Match Score']}</p>
+                  <p><strong>Registration URL:</strong> <a href="${event['Registration URL']}" target="_blank">${event['Registration URL']}</a></p>
+                  <p><strong>Event URL:</strong> <a href="${event['Event URL']}" target="_blank">${event['Event URL']}</a></p>
+              `;
 
-          eventList.appendChild(eventElement);
-        });
+              eventList.appendChild(eventElement);
+          });
       }
+
     </script>
 
     <!-- Bootstrap JS and dependencies -->

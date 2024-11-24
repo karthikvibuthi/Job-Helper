@@ -51,7 +51,7 @@ def sections_completeness(sections):
 # Extract skills
 def extract_skills(nlp_text):
     tokens = [token.text for token in nlp_text if not token.is_stop]
-    skills = pd.read_csv('/content/skills.csv').columns.tolist()
+    skills = pd.read_csv('./skills.csv').columns.tolist()
     print(f"Tokens: {tokens}")
     detected_skills = set(token.lower() for token in tokens if token.lower() in skills)
     print(f"Detected Skills: {detected_skills}")

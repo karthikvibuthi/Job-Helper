@@ -69,10 +69,9 @@ def parse_resume(resume_text):
         'projects': [],
         'summary': '',
         'objective': '',
-        'score': 1,
+        'scores_new': None,
         'jobs':[],
         'totalJobs':0,
-        'secondary_score':0,
         'events':[],
         'total_events':0
     }
@@ -114,7 +113,7 @@ def parse_resume(resume_text):
     if "Achievements" in sections:
         achievements = sections["Achievements"]
     details['achievements'] = resume_parser.count_bullet_points(achievements) if achievements else []
-    details['scores_new'] = scoring.calculate_resume_score(resume_text)
+    details['scores'] = scoring.calculate_resume_score(resume_text)
 
 
 
@@ -132,38 +131,49 @@ def parse_resume(resume_text):
     #details['summary'] = resume_parser.extract_summary(resume_text)                # Summary section of resume
     #details['objective'] = resume_parser.extract_objective(resume_text)            # Objective section of resume
     #details['accomplishments'] = resume_parser.extract_accomplishments(resume_text) # Accomplishments section
-
-    # Create a ResumeScorer instance
-    scorer = resume_parser.ResumeScorer(details)
-
-    # Calculate the score
-    score = scorer.calculate_score()
-    details['score'] = score
-
-    #alternative
-    details["secondary_score"] = resume_parser.calculate_score(details)
-
-    #jobs
-    job_list_csv = 'job_listings_latest_skills.csv'
-
-    # Get job recommendations
-    #details['jobs'] = jr.get_job_recommendations(details['skills'], job_list_csv)
-    details['jobs'] = jr.get_job_recommendations_sentence_transformer(resume_text, job_list_csv)
-    details['totalJobs'] = len(details['jobs'])
-
-    #events
-    events_list_csv = "events_list_latest_3.csv"
-
-    #Get job recommendations with salary
-    details['events'] = er.get_event_recommendations_sentence_transformer(resume_text, events_list_csv)
-    details['total_events'] = len(details['events'])
     
 
     return details
 
+def match_jobs_and_events(resume_text):
+    """
+    Matches jobs and events based on the resume text by using pre-initialized embeddings.
+
+    Parameters:
+    resume_text (list of str): A list of skills or relevant text from the resume.
+
+    Returns:
+    dict: A dictionary containing job recommendations, event recommendations, 
+          and their respective counts.
+    """
+    details = {}
+
+    # Ensure the job embeddings are pre-initialized
+    if jr.encoded_job_embeddings is None or jr.job_listings_df is None:
+        raise ValueError("Job embeddings are not initialized. Call `initialize_job_embeddings` first.")
+
+    # Ensure the event embeddings are pre-initialized
+    if er.encoded_event_embeddings is None or er.events_df is None:
+        raise ValueError("Event embeddings are not initialized. Call `initialize_event_embeddings` first.")
+
+    # Get job recommendations
+    print("Fetching job recommendations...")
+    details['jobs'] = jr.get_job_recommendations_sentence_transformer(resume_text)
+    details['totalJobs'] = len(details['jobs'])
+
+    # Get event recommendations
+    print("Fetching event recommendations...")
+    details['events'] = er.get_event_recommendations_sentence_transformer(resume_text)
+    details['totalEvents'] = len(details['events'])
+
+    return details
 
 # Function to take a file as input and return parsed details
 def extract_resume_details(pdf_file):
     resume_text = fetch_resume(pdf_file)
     return parse_resume(resume_text)
+
+def extract_match_jobs_and_events(pdf_file):
+    resume_text = fetch_resume(pdf_file)
+    return match_jobs_and_events(resume_text)
 
