@@ -1,0 +1,17 @@
+# Core Dependencies
+Flask            # For building the Flask API
+pandas           # Data manipulation and analysis
+
+# Natural Language Processing (NLP)
+spacy            # NLP processing
+nltk             # Tokenization, lemmatization, and more
+tika             # For parsing and extracting content from documents
+sentence-transformers # Semantic similarity and embeddings
+
+# Additional NLP Libraries
+spellchecker     # For spell-checking functionality
+
+# Utilities
+collections-extended # To handle Counters and defaultdict (alternative to stdlib collections)
+pyspellchecker
+gunicorn
